@@ -1,0 +1,79 @@
+﻿<table #table class="table">
+    <thead>
+        <tr>
+            <th *ngFor="let c of columns" class="hy-header-cell">
+                <div style="display: flex; flex-direction: row;">
+                    <div style="flex: 1 100%;" [hyHeader]="c" (click)="onHeaderClicked($event, c)"></div>
+                    <div style="flex: 0 auto; margin-right: 4px;" [style.visibility]="c.activeFilters.length == 0 ? 'hidden' : 'visible'">
+                        <span class="glyphicon glyphicon-filter text-info"></span>
+                    </div>
+                    <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection">
+                        <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted hy-sort-icon"></span>
+                        <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted hy-sort-icon"></span>
+                        <span *ngSwitchDefault class="glyphicon glyphicon-sort text-muted hy-sort-icon"></span>
+                    </div>
+                    <div style="flex: 0 auto;">
+                        <span class="hy-options-button" [hyPopover]="{column: c, content: content, input: input, close: close}" hy-popover>
+                            <span class="glyphicon glyphicon-option-vertical"></span>
+                        </span>
+                    </div>
+                    <div class="hy-options-container" style="display: none;" #content>
+                        <div style="display: flex; flex-direction: column; height: 100%;">
+                            <div style="flex: 0 auto;">
+                                <p hyI18n="hy.options.no-filters" style="margin-top: 8px;" class="text-muted" *ngIf="c.activeFilters.length === 0"></p>
+                            </div>
+                            <div style="flex: 1 auto; overflow: auto; margin-top: 8px; max-height: 250px;" *ngIf="c.activeFilters.length > 0">
+                                <div class="list-group" *ngIf="c.activeFilters.length > 0">
+                                    <a href="#" class="list-group-item active" *ngFor="let f of c.activeFilters" (click)="c.removeFilter($event, f)">
+                                        <div style="display: flex; flex-direction: row;">
+                                            <span style="flex: 1 100%;">{{f.value}}</span>
+                                            <span style="flex: 0 auto;">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <button class="btn btn-warning" style="width: 100%; margin-bottom: 20px;" 
+                                hyI18n="hy.options.clear-filters" *ngIf="c.activeFilters.length > 0" (click)="c.removeAllFilters($event)"></button>
+                            <hr style="width: 100%;" />
+                            <div style="flex: 0 auto;">
+                                <input id="input-query" class="form-control" [(ngModel)]="c.candidateQuery" #input />
+                            </div>
+                            <div style="flex: 0 300px; overflow: auto; margin-top: 8px;">
+                                <p hyI18n="hy.options.many" class="text-muted" *ngIf="c.candidates.length > c.threshold"></p>
+                                <div class="list-group" *ngIf="c.candidates.length <= c.threshold">
+                                    <a href="#" class="list-group-item" *ngFor="let can of c.candidates" (click)="c.onCandidateClicked($event, can)">
+                                        <div style="display: flex; flex-direction: row;">
+                                            <span style="flex: 1 100%;">{{can.value}}</span>
+                                            <span style="flex: 0 auto;">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div style="flex: 0 auto;">
+                                <button class="btn btn-default" hyI18n="hy.options.close" style="width: 100%; margin-top: 10px;" #close></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of items">
+            <td *ngFor="let c of columns" [hyCell]="{data: item, column: c}"></td>
+        </tr>
+    </tbody>
+</table>
+<div class="btn-group" role="group" aria-label="Pages" *ngIf="pageCount > 1">
+    <button (click)="onPageChanged($event, 0)" class="btn btn-secondary">
+        <span class="glyphicon glyphicon-fast-backward"></span>
+    </button>
+    <button *ngFor="let i of pagingRange" (click)="onPageChanged($event, i)" class="btn btn-secondary" [class.btn-primary]="pageIndex === i">{{i+1}}</button>
+    <button (click)="onPageChanged($event, pageCount-1)" class="btn btn-secondary">
+        <span class="glyphicon glyphicon-fast-forward"></span>
+    </button>
+</div>

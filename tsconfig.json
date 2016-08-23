@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "emitDecoratorMetadata": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "target": "es5",
+        "suppressImplicitAnyIndexErrors":true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "sourceMap": true
+    },
+    "exclude": [
+        "node_modules",
+        "wwwroot"
+    ]
+}

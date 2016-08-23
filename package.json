@@ -1,0 +1,42 @@
+{
+  "name": "xenos",
+  "version": "0.1.0",
+  "description": "Xenos is a data grid built upon angular2 and bootstrap.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crystalbyte/hydra.git"
+  },
+  "keywords": [
+    "grid",
+    "angular",
+    "bootstrap",
+    "bs",
+    "angular"
+  ],
+  "author": "Alexander Wieser <alexander.wieser@crystalbyte.de>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crystalbyte/hydra/issues"
+  },
+  "homepage": "https://github.com/crystalbyte/hydra#readme",
+  "dependencies": {
+    "@angular/core": "2.0.0-rc.4",
+    "@angular/compiler": "2.0.0-rc.4",
+    "@angular/common": "2.0.0-rc.4",
+    "@angular/forms": "0.2.0",
+    "core-js": "^2.4.0",
+    "reflect-metadata": "^0.1.3",
+    "zone.js": "0.6.15",
+    "rxjs": "5.0.0-beta.6",
+    "bootstrap": "^3.3.6"
+  },
+  "devDependencies": {
+    "typings": "^1.3.2",
+    "less": "^2.7.1",
+    "less-plugin-clean-css": "^1.5.1"
+  }
+}
