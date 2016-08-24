@@ -2,7 +2,7 @@
 import { DataGridColumn } from "./data-grid-column";
 
 @Directive({
-    selector: "[hyHeader]"
+    selector: "[xnHeader]"
 })
 export class HeaderDirective {
 
@@ -12,7 +12,7 @@ export class HeaderDirective {
     }
 
     @Input()
-    public set hyHeader(column: DataGridColumn) {
+    public set xnHeader(column: DataGridColumn) {
 
         let r = column.config.headerRenderer();
         if (typeof r === "string") {
@@ -23,7 +23,7 @@ export class HeaderDirective {
             return;
         }
 
-        if (typeof r === "[object Object]") {
+        if (typeof r === "object") {
             this.appendToHeader(r);
             return;
         }

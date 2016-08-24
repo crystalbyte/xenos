@@ -90,11 +90,13 @@ export class DataGridColumn {
         this.sortDirectionInternal = this.sortDirectionCycler.get(this.sortDirectionInternal);
     }
 
-    private removeAllFilters(event: Event): void {
+    private removeAllColumnFilters(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
 
+        let filters = this.dataGrid.filterDescriptors.filter(x => x.groupId !== this.config.id);
         this.dataGrid.filterDescriptors.splice(0);
+        filters.forEach(x => this.dataGrid.filterDescriptors.push(x));
     }
 
     private removeFilter(event: Event, descriptor: FilterDescriptor): void {

@@ -1,26 +1,26 @@
 ﻿<table #table class="table">
     <thead>
         <tr>
-            <th *ngFor="let c of columns" class="hy-header-cell">
+            <th *ngFor="let c of columns" class="xn-header-cell">
                 <div style="display: flex; flex-direction: row;">
-                    <div style="flex: 1 100%;" [hyHeader]="c" (click)="onHeaderClicked($event, c)"></div>
+                    <div style="flex: 1 100%;" [xnHeader]="c" (click)="onHeaderClicked($event, c)"></div>
                     <div style="flex: 0 auto; margin-right: 4px;" [style.visibility]="c.activeFilters.length == 0 ? 'hidden' : 'visible'">
                         <span class="glyphicon glyphicon-filter text-info"></span>
                     </div>
                     <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection">
-                        <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted hy-sort-icon"></span>
-                        <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted hy-sort-icon"></span>
-                        <span *ngSwitchDefault class="glyphicon glyphicon-sort text-muted hy-sort-icon"></span>
+                        <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted xn-sort-icon"></span>
+                        <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted xn-sort-icon"></span>
+                        <span *ngSwitchDefault class="glyphicon glyphicon-sort text-muted xn-sort-icon"></span>
                     </div>
                     <div style="flex: 0 auto;">
-                        <span class="hy-options-button" [hyPopover]="{column: c, content: content, input: input, close: close}" hy-popover>
+                        <span class="xn-options-button" [xnPopover]="{column: c, content: content, input: input, close: close}" xn-linked>
                             <span class="glyphicon glyphicon-option-vertical"></span>
                         </span>
                     </div>
-                    <div class="hy-options-container" style="display: none;" #content>
+                    <div class="xn-options-container" style="display: none;" #content>
                         <div style="display: flex; flex-direction: column; height: 100%;">
                             <div style="flex: 0 auto;">
-                                <p hyI18n="hy.options.no-filters" style="margin-top: 8px;" class="text-muted" *ngIf="c.activeFilters.length === 0"></p>
+                                <p xnI18n="xn.options.no-filters" style="margin-top: 8px;" class="text-muted" *ngIf="c.activeFilters.length === 0"></p>
                             </div>
                             <div style="flex: 1 auto; overflow: auto; margin-top: 8px; max-height: 250px;" *ngIf="c.activeFilters.length > 0">
                                 <div class="list-group" *ngIf="c.activeFilters.length > 0">
@@ -35,13 +35,13 @@
                                 </div>
                             </div>
                             <button class="btn btn-warning" style="width: 100%; margin-bottom: 20px;" 
-                                hyI18n="hy.options.clear-filters" *ngIf="c.activeFilters.length > 0" (click)="c.removeAllFilters($event)"></button>
+                                xnI18n="xn.options.clear-filters" *ngIf="c.activeFilters.length > 0" (click)="c.removeAllColumnFilters($event)"></button>
                             <hr style="width: 100%;" />
                             <div style="flex: 0 auto;">
                                 <input id="input-query" class="form-control" [(ngModel)]="c.candidateQuery" #input />
                             </div>
                             <div style="flex: 0 300px; overflow: auto; margin-top: 8px;">
-                                <p hyI18n="hy.options.many" class="text-muted" *ngIf="c.candidates.length > c.threshold"></p>
+                                <p xnI18n="xn.options.many" class="text-muted" *ngIf="c.candidates.length > c.threshold"></p>
                                 <div class="list-group" *ngIf="c.candidates.length <= c.threshold">
                                     <a href="#" class="list-group-item" *ngFor="let can of c.candidates" (click)="c.onCandidateClicked($event, can)">
                                         <div style="display: flex; flex-direction: row;">
@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                             <div style="flex: 0 auto;">
-                                <button class="btn btn-default" hyI18n="hy.options.close" style="width: 100%; margin-top: 10px;" #close></button>
+                                <button class="btn btn-default" xnI18n="xn.options.close" style="width: 100%; margin-top: 10px;" #close></button>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
     </thead>
     <tbody>
         <tr *ngFor="let item of items">
-            <td *ngFor="let c of columns" [hyCell]="{data: item, column: c}"></td>
+            <td *ngFor="let c of columns" [xnCell]="{data: item, column: c}"></td>
         </tr>
     </tbody>
 </table>

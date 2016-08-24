@@ -7,7 +7,7 @@ interface CellRenderArgs {
 }
 
 @Directive({
-    selector: "[hyCell]"
+    selector: "[xnCell]"
 })
 export class CellDirective {
 
@@ -17,7 +17,7 @@ export class CellDirective {
     }
 
     @Input()
-    public set hyCell(value: CellRenderArgs) {
+    public set xnCell(value: CellRenderArgs) {
         let r = value.column.config.cellRenderer(value.data);
         if (typeof r === "string") {
             let parser = new DOMParser();
@@ -27,7 +27,7 @@ export class CellDirective {
             return;
         }
 
-        if (typeof r === "[object Object]") {
+        if (typeof r === "object") {
             this.appendToCell(r);
             return;
         }

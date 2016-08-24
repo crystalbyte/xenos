@@ -10,6 +10,10 @@ import { I18n } from "./i18n";
 import { I18nDirective } from "./i18n.directive";
 import { ObservableArray } from "./observable-array";
 import { PopoverDirective } from "./popover.directive";
+import { Observable } from "rxjs/Observable";
+
+// Some IDE's won't recognize the module.
+declare var module: { id: any }
 
 @Component({
     moduleId: module.id,
@@ -50,6 +54,10 @@ export class DataGrid implements AfterViewInit {
                 }
             });
         });
+    }
+
+    public get itemsViewChanged(): Observable<any[]>  {
+        return this.viewSource.itemsViewChanged;
     }
 
     public get i18n(): I18n {

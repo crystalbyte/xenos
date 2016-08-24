@@ -13,7 +13,7 @@ interface PopoverConfig {
 }
 
 @Directive({
-    selector: "[hyPopover]",
+    selector: "[xnPopover]",
     providers: [I18N_SERVICE_PROVIDER]
 })
 export class PopoverDirective {
@@ -32,7 +32,7 @@ export class PopoverDirective {
     /// http://jsfiddle.net/mattdlockyer/C5GBU/2/
     private static initialize(): void {
         $("body").on("click", function (e) {
-            $("[hy-popover]").each(function () {
+            $("[xn-linked]").each(function () {
                 //the 'is' for buttons that trigger popups
                 //the 'has' for icons within a button that triggers a popup
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $(".popover").has(e.target).length === 0) {
@@ -45,7 +45,7 @@ export class PopoverDirective {
     }
 
     @Input()
-    public set hyPopover(config: PopoverConfig) {
+    public set xnPopover(config: PopoverConfig) {
 
         $(config.close).on("click", x => {
             $(this.elementRef.nativeElement).popover("hide");

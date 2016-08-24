@@ -2,7 +2,7 @@
 import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
 
 @Directive({
-    selector: "[hyI18n]",
+    selector: "[xnI18n]",
     providers: [I18N_SERVICE_PROVIDER]
 })
 export class I18nDirective {
@@ -14,7 +14,7 @@ export class I18nDirective {
     }
 
     @Input()
-    public set hyI18n(key: string) {
+    public set xnI18n(key: string) {
         let value = this.i18nService.requestTranslation(key);
         this.renderer.setText(this.elementRef.nativeElement, value); 
     }
