@@ -2,8 +2,8 @@
 
 export interface DataGridColumnConfig {
     id?: any;
-    headerRenderer: () => string | HTMLElement;
-    cellRenderer: (x: any) => string | HTMLElement;
+    headerRenderer: (c?: HTMLTableHeaderCellElement, r?: HTMLTableRowElement) => string | HTMLElement;
+    cellRenderer: (x: any, c?: HTMLTableDataCellElement, r?: HTMLTableRowElement) => string | HTMLElement;
     valueAccessor: (x: any) => any;
     sortDirection?: SortDirection;
 }

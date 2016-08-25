@@ -55,7 +55,7 @@ export class PopoverDirective {
             html: true,
             placement: "bottom",
             trigger: "manual",
-            title: this.i18nService.requestTranslation("hy.options.title"),
+            title: this.i18nService.requestTranslation("xn.options.title"),
             content: x => $(config.content)
         }).on("click", e => {
             $(this.elementRef.nativeElement).popover("show");

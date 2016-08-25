@@ -1,9 +1,9 @@
 ﻿<table #table class="table">
     <thead>
-        <tr>
-            <th *ngFor="let c of columns" class="xn-header-cell">
+        <tr #theadrow>
+            <th *ngFor="let c of columns" class="xn-header-cell" #theadcell>
                 <div style="display: flex; flex-direction: row;">
-                    <div style="flex: 1 100%;" [xnHeader]="c" (click)="onHeaderClicked($event, c)"></div>
+                    <div style="flex: 1 100%;" [xnHeader]="{column: c, cell: theadcell, row: theadrow}" (click)="onHeaderClicked($event, c)"></div>
                     <div style="flex: 0 auto; margin-right: 4px;" [style.visibility]="c.activeFilters.length == 0 ? 'hidden' : 'visible'">
                         <span class="glyphicon glyphicon-filter text-info"></span>
                     </div>
@@ -63,8 +63,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let item of items">
-            <td *ngFor="let c of columns" [xnCell]="{data: item, column: c}"></td>
+        <tr *ngFor="let item of items" #tbodyrow>
+            <td *ngFor="let c of columns" [xnCell]="{data: item, column: c, cell: tbodycell, row: tbodyrow}" #tbodycell></td>
         </tr>
     </tbody>
 </table>

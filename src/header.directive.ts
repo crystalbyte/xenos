@@ -1,6 +1,12 @@
 ﻿import { Directive, ElementRef, Renderer, Input } from "@angular/core";
 import { DataGridColumn } from "./data-grid-column";
 
+interface HeaderRenderArgs {
+    column: DataGridColumn;
+    cell: HTMLTableDataCellElement,
+    row: HTMLTableRowElement
+}
+
 @Directive({
     selector: "[xnHeader]"
 })
@@ -12,9 +18,9 @@ export class HeaderDirective {
     }
 
     @Input()
-    public set xnHeader(column: DataGridColumn) {
+    public set xnHeader(args: HeaderRenderArgs) {
 
-        let r = column.config.headerRenderer();
+        let r = args.column.config.headerRenderer(args.cell, args.row);
         if (typeof r === "string") {
             let parser = new DOMParser();
             let document = parser.parseFromString(r, "text/html");

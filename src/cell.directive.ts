@@ -4,6 +4,8 @@ import { DataGridColumn } from "./data-grid-column";
 interface CellRenderArgs {
     data: any;
     column: DataGridColumn;
+    cell: HTMLTableDataCellElement,
+    row: HTMLTableRowElement
 }
 
 @Directive({
@@ -17,8 +19,8 @@ export class CellDirective {
     }
 
     @Input()
-    public set xnCell(value: CellRenderArgs) {
-        let r = value.column.config.cellRenderer(value.data);
+    public set xnCell(args: CellRenderArgs) {
+        let r = args.column.config.cellRenderer(args.data, args.cell, args.row);
         if (typeof r === "string") {
             let parser = new DOMParser();
             let document = parser.parseFromString(r, "text/html");
