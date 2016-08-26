@@ -1,5 +1,5 @@
 ﻿import { Component, ElementRef, Input, Renderer, ViewChild, AfterViewInit } from "@angular/core";
-import { ViewSource } from "./view-source";
+import { ViewSource, ItemsPreview } from "./view-source";
 import { CellDirective } from "./cell.directive";
 import { HeaderDirective } from "./header.directive";
 import { DataGridColumn } from "./data-grid-column";
@@ -54,6 +54,10 @@ export class DataGrid implements AfterViewInit {
                 }
             });
         });
+    }
+
+    public get itemsViewChanging(): Observable<ItemsPreview>  {
+        return this.viewSource.itemsViewChanging;
     }
 
     public get itemsViewChanged(): Observable<any[]>  {

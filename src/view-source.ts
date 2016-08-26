@@ -10,6 +10,13 @@ import "rxjs/add/operator/do";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/observeOn";
 
+export interface ItemsPreview {
+    items?: any[];
+    filteredItems?: any[];
+    sortedItems?: any[];
+    viewItems?: any[];
+}
+
 export class ViewSource {
 
     private static empty: any[] = [];
@@ -17,26 +24,54 @@ export class ViewSource {
     private pageSizeInternal: number;
     private pageIndexInternal: number;
     private pageCountInternal: number = 1;
+    private itemsPreviewer: Subject<ItemsPreview> = new Subject<ItemsPreview>();
     private itemsLoader: Subject<any[]> = new Subject<any[]>();
 
     constructor() {
         this.pageIndex = 0;
         this.pageSize = Number.MAX_SAFE_INTEGER;
+        this.itemsViewChanging = this.itemsPreviewer
+            .asObservable();
+
         this.itemsViewChanged = this.itemsLoader
             .asObservable()
             .observeOn(async)
             .do(x => this.working = true)
-            .map(x => this.filterItems(x))
-            .do(x => this.pageCountInternal = Math.ceil(x.length / this.pageSize))
-            .map(x => this.sortItems(x))
-            .map(x => this.applyPaging(x))
+            .map(x => {
+                let container: ItemsPreview = {
+                    items: x
+                };
+                return container;
+            })
+            .map(x => {
+                x.filteredItems = this.filterItems(x.items); 
+                return x;
+            })
+            .do(x => this.calculatePageCount(x.filteredItems))
+            .map(x => {
+                x.sortedItems = this.sortItems(x.filteredItems);
+                return x;
+            })
+            .map(x => {
+                x.viewItems = this.applyPaging(x.sortedItems);
+                return x;
+            })
+            .map(x => {
+                this.itemsPreviewer.next(x);
+                return x.viewItems;
+            })
             .do(x => this.working = false);
     }
 
     public working: boolean = false;
+    public itemsViewChanging: Observable<ItemsPreview>;
     public itemsViewChanged: Observable<any[]>;
     public sortDescriptors: ObservableArray<SortDescriptor> = new ObservableArray<SortDescriptor>();
     public filterDescriptors: ObservableArray<FilterDescriptor> = new ObservableArray<FilterDescriptor>();
+
+    private calculatePageCount(items: any[]): void {
+        this.pageCountInternal = Math.ceil(items.length / this.pageSize)
+    }
 
     public set pageIndex(value: number) {
         if (value > this.pageCount - 1) {
