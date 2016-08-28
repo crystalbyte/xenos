@@ -5,6 +5,7 @@ import { HeaderDirective } from "./header.directive";
 import { DataGridColumn } from "./data-grid-column";
 import { SortDescriptor } from "./sort-descriptor";
 import { FilterDescriptor } from "./filter-descriptor";
+import { FtsFilterDescriptor } from "./fts-filter-descriptor";
 import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
 import { I18n } from "./i18n";
 import { I18nDirective } from "./i18n.directive";
@@ -56,11 +57,24 @@ export class DataGrid implements AfterViewInit {
         });
     }
 
-    public get itemsViewChanging(): Observable<ItemsPreview>  {
+    public set searchPhrase(phrase: string) {
+        let index = this.filterDescriptors.findIndex(x => x.id === FtsFilterDescriptor.id);
+        if (~index) {
+            this.filterDescriptors.splice(index, 1);
+        }
+        
+        if (phrase == "" || phrase == null) {
+            return;
+        }
+
+        this.filterDescriptors.push(new FtsFilterDescriptor(this.columns, phrase));
+    }
+
+    public get itemsViewChanging(): Observable<ItemsPreview> {
         return this.viewSource.itemsViewChanging;
     }
 
-    public get itemsViewChanged(): Observable<any[]>  {
+    public get itemsViewChanged(): Observable<any[]> {
         return this.viewSource.itemsViewChanged;
     }
 
