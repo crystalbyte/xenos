@@ -42,6 +42,10 @@ export class DataGridColumn {
             this.sortDirection = config.sortDirection;
         }
 
+        if (config.hidden == null) {
+            config.hidden = false;
+        } 
+
         this.config = config;
         this.candidateFinder.asObservable()
             .debounce(x => Observable.timer(this.debounceThreshold))

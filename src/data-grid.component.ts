@@ -13,7 +13,7 @@ import { ObservableArray } from "./observable-array";
 import { PopoverDirective } from "./popover.directive";
 import { Observable } from "rxjs/Observable";
 
-// Some IDE's won't recognize the module.
+// Some IDE's won't recognize the module node. I'm looking at you VS2015 ...
 declare var module: { id: any }
 
 @Component({
@@ -57,12 +57,21 @@ export class DataGrid implements AfterViewInit {
         });
     }
 
+    @ViewChild("table")
+    private table: ElementRef;
+
+    @Input()
+    public set pageSize(value: number) {
+        this.viewSource.pageSize = value;
+        this.viewSource.refresh();
+    }
+
     public set searchPhrase(phrase: string) {
         let index = this.filterDescriptors.findIndex(x => x.id === FtsFilterDescriptor.id);
         if (~index) {
             this.filterDescriptors.splice(index, 1);
         }
-        
+
         if (phrase == "" || phrase == null) {
             return;
         }
@@ -108,15 +117,6 @@ export class DataGrid implements AfterViewInit {
 
     public set pageIndex(value: number) {
         this.viewSource.pageIndex = value;
-        this.viewSource.refresh();
-    }
-
-    @ViewChild("table")
-    private table: ElementRef;
-
-    @Input()
-    public set pageSize(value: number) {
-        this.viewSource.pageSize = value;
         this.viewSource.refresh();
     }
 

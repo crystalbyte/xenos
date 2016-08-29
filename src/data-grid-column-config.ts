@@ -5,5 +5,6 @@ export interface DataGridColumnConfig {
     headerRenderer: (c?: HTMLTableHeaderCellElement, r?: HTMLTableRowElement) => string | HTMLElement;
     cellRenderer: (x: any, c?: HTMLTableDataCellElement, r?: HTMLTableRowElement) => string | HTMLElement;
     valueAccessor: (x: any) => any;
+    hidden?: boolean;
     sortDirection?: SortDirection;
 }
