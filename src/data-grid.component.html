@@ -4,7 +4,7 @@
             <th *ngFor="let c of columns" [hidden]="c.config?.hidden" class="xn-header-cell" #theadcell>
                 <div style="display: flex; flex-direction: row;">
                     <div style="flex: 1 100%;" [class.text-primary]="c.activeFilters.length > 0" [xnHeader]="{column: c, cell: theadcell, row: theadrow}" (click)="onHeaderClicked($event, c)"></div>
-                    <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection">
+                    <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection" style="padding-left: 8px;">
                         <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted xn-sort-icon"></span>
                         <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted xn-sort-icon"></span>
                         <span *ngSwitchDefault class="glyphicon glyphicon-sort text-muted xn-sort-icon"></span>
