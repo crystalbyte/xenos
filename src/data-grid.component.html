@@ -1,12 +1,9 @@
 ﻿<table #table class="table">
     <thead>
-        <tr #theadrow>
+        <tr #theadrow class="xn-header-row">
             <th *ngFor="let c of columns" [hidden]="c.config?.hidden" class="xn-header-cell" #theadcell>
                 <div style="display: flex; flex-direction: row;">
-                    <div style="flex: 1 100%;" [xnHeader]="{column: c, cell: theadcell, row: theadrow}" (click)="onHeaderClicked($event, c)"></div>
-                    <div style="flex: 0 auto; margin-right: 4px;" [style.visibility]="c.activeFilters.length == 0 ? 'hidden' : 'visible'">
-                        <span class="glyphicon glyphicon-filter text-info"></span>
-                    </div>
+                    <div style="flex: 1 100%;" [class.text-primary]="c.activeFilters.length > 0" [xnHeader]="{column: c, cell: theadcell, row: theadrow}" (click)="onHeaderClicked($event, c)"></div>
                     <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection">
                         <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted xn-sort-icon"></span>
                         <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted xn-sort-icon"></span>
@@ -34,9 +31,10 @@
                                     </a>
                                 </div>
                             </div>
-                            <button class="btn btn-warning" style="width: 100%; margin-bottom: 20px;" 
-                                xnI18n="xn.options.clear-filters" *ngIf="c.activeFilters.length > 0" (click)="c.removeAllColumnFilters($event)"></button>
-                            <hr style="width: 100%;" />
+                            <div *ngIf="c.activeFilters.length > 0">
+                                <button class="btn btn-default" style="width: 100%;" xnI18n="xn.options.clear-filters" (click)="c.removeAllColumnFilters($event)"></button>
+                                <hr style="width: 100%;" />
+                            </div>
                             <div style="flex: 0 auto;">
                                 <input id="input-query" class="form-control" [(ngModel)]="c.candidateQuery" #input />
                             </div>
@@ -63,17 +61,20 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let item of items" #tbodyrow>
-            <td *ngFor="let c of columns" [hidden]="c.config?.hidden" [xnCell]="{data: item, column: c, cell: tbodycell, row: tbodyrow}" #tbodycell></td>
+        <tr *ngFor="let item of items" class="xn-row" #tbodyrow>
+            <td *ngFor="let c of columns" [hidden]="c.config?.hidden" class="xn-cell" [xnCell]="{data: item, column: c, cell: tbodycell, row: tbodyrow}"
+                #tbodycell></td>
         </tr>
     </tbody>
 </table>
-<div class="btn-group" role="group" aria-label="Pages" *ngIf="pageCount > 1">
-    <button (click)="onPageChanged($event, 0)" class="btn btn-secondary">
+<div class="xn-paging-container">
+    <div class="btn-group" role="group" aria-label="Pages" *ngIf="pageCount > 1">
+        <button (click)="onPageChanged($event, 0)" class="btn btn-secondary xn-paging-button">
         <span class="glyphicon glyphicon-fast-backward"></span>
     </button>
-    <button *ngFor="let i of pagingRange" (click)="onPageChanged($event, i)" class="btn btn-secondary" [class.btn-primary]="pageIndex === i">{{i+1}}</button>
-    <button (click)="onPageChanged($event, pageCount-1)" class="btn btn-secondary">
+        <button *ngFor="let i of pagingRange" (click)="onPageChanged($event, i)" class="btn btn-secondary xn-paging-button" [class.btn-primary]="pageIndex === i">{{i+1}}</button>
+        <button (click)="onPageChanged($event, pageCount-1)" class="btn btn-secondary xn-paging-button">
         <span class="glyphicon glyphicon-fast-forward"></span>
     </button>
+    </div>
 </div>
