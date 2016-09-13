@@ -2,6 +2,7 @@
 import { ViewSource, ItemsPreview } from "./view-source";
 import { CellDirective } from "./cell.directive";
 import { HeaderDirective } from "./header.directive";
+import { CandidateDirective } from "./candidate.directive";
 import { DataGridColumn } from "./data-grid-column";
 import { SortDescriptor } from "./sort-descriptor";
 import { ColumnSortDescriptor } from "./column-sort-descriptor";
@@ -23,7 +24,7 @@ declare var module: { id: any }
     selector: "data-grid",
     templateUrl: "data-grid.component.html",
     styleUrls: ["data-grid.component.min.css"],
-    directives: [CellDirective, HeaderDirective, I18nDirective, PopoverDirective],
+    directives: [CellDirective, HeaderDirective, I18nDirective, PopoverDirective, CandidateDirective],
     providers: [I18N_SERVICE_PROVIDER]
 })
 export class DataGrid implements AfterViewInit {

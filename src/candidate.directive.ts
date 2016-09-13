@@ -2,16 +2,15 @@
 import { DataGridColumn } from "./data-grid-column";
 import { ElementRenderer } from "./element-renderer";
 
-interface HeaderRenderArgs {
-    column: DataGridColumn;
-    cell: HTMLTableDataCellElement,
-    row: HTMLTableRowElement
+interface CandidateRenderArgs {
+    data: any,
+    column: DataGridColumn
 }
 
 @Directive({
-    selector: "[xnHeader]"
+    selector: "[xnCandidate]"
 })
-export class HeaderDirective {
+export class CandidateDirective {
 
     private elementRenderer: ElementRenderer;
 
@@ -22,8 +21,10 @@ export class HeaderDirective {
     }
 
     @Input()
-    public set xnHeader(args: HeaderRenderArgs) {
-        let value = args.column.headerRenderer(args.cell, args.row);
+    public set xnCandidate(args: CandidateRenderArgs) {
+        let func: (x: any) => any = args.column.candidateRenderer || (x => `<span>${x}</span>`);
+        let value = func(args.data);
+
         if (value == null || value == "") {
             return;
         }

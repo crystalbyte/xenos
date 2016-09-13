@@ -16,7 +16,7 @@ import "rxjs/add/operator/map";
 
 export class DataGridColumn {
 
-    private threshold: number = 25;
+    private threshold: number = 30;
     private config: DataGridColumnConfig;
     private debounceThreshold: number = 200;
     private candidateQueryInternal: string = "";
@@ -124,6 +124,10 @@ export class DataGridColumn {
 
     public get headerRenderer(): (c?: HTMLTableHeaderCellElement, r?: HTMLTableRowElement) => string | HTMLElement {
         return this.config.headerRenderer;
+    }
+
+    public get candidateRenderer(): (x: any) => string | HTMLElement {
+        return this.config.candidateRenderer;
     }
 
     private ensureAttachment(): void {
