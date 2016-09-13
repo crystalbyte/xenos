@@ -1,6 +1,6 @@
 {
   "name": "xenos",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Xenos is a data grid built upon angular2 and bootstrap.",
   "main": "index.js",
   "scripts": {

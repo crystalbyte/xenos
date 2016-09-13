@@ -4,11 +4,13 @@ import { CellDirective } from "./cell.directive";
 import { HeaderDirective } from "./header.directive";
 import { DataGridColumn } from "./data-grid-column";
 import { SortDescriptor } from "./sort-descriptor";
+import { ColumnSortDescriptor } from "./column-sort-descriptor";
 import { FilterDescriptor } from "./filter-descriptor";
 import { FtsFilterDescriptor } from "./fts-filter-descriptor";
 import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
 import { I18n } from "./i18n";
 import { I18nDirective } from "./i18n.directive";
+import { IdGenerator } from "./id-generator";
 import { ObservableArray } from "./observable-array";
 import { PopoverDirective } from "./popover.directive";
 import { Observable } from "rxjs/Observable";
@@ -29,6 +31,7 @@ export class DataGrid implements AfterViewInit {
     private itemsPresenter: any[] = [];
     private viewSource: ViewSource = null;
     private pagingRangeInternal: number[] = [];
+    private deferRefreshInternal: boolean = false;
     private columnsInternal: ObservableArray<DataGridColumn> = null;
 
     constructor(
@@ -41,17 +44,20 @@ export class DataGrid implements AfterViewInit {
             .subscribe(x => this.onItemsViewChanged(x));
 
         this.viewSource.filterDescriptors.itemsChanged.subscribe(x => {
-            this.viewSource.refresh();
+            this.autoRefresh();
+        });
+
+        this.viewSource.sortDescriptors.itemsChanged.subscribe(x => {
+            this.autoRefresh();
         });
 
         this.columnsInternal = new ObservableArray<DataGridColumn>();
         this.columnsInternal.itemsChanged.subscribe(x => {
-            x.itemsRemoved.forEach(x => x.dataGrid = null);
+            x.itemsRemoved.forEach(x => x.dataGrid = undefined);
             x.itemsAdded.forEach(x => {
                 x.dataGrid = this;
-                if (x.sortDirection != null) {
-                    this.viewSource.sortDescriptors.push(
-                        new SortDescriptor(x.config.id, x.sortDirection, x.config.valueAccessor));
+                if (x.sortDirection) {
+                    x.sortDirection = x.initialSortDirection;
                 }
             });
         });
@@ -63,7 +69,7 @@ export class DataGrid implements AfterViewInit {
     @Input()
     public set pageSize(value: number) {
         this.viewSource.pageSize = value;
-        this.viewSource.refresh();
+        this.autoRefresh();
     }
 
     public set searchPhrase(phrase: string) {
@@ -72,7 +78,7 @@ export class DataGrid implements AfterViewInit {
             this.filterDescriptors.splice(index, 1);
         }
 
-        if (phrase == "" || phrase == null) {
+        if (!phrase) {
             return;
         }
 
@@ -117,7 +123,7 @@ export class DataGrid implements AfterViewInit {
 
     public set pageIndex(value: number) {
         this.viewSource.pageIndex = value;
-        this.viewSource.refresh();
+        this.autoRefresh();
     }
 
     public get pageSize(): number {
@@ -126,7 +132,7 @@ export class DataGrid implements AfterViewInit {
 
     public set itemsSource(source: any[]) {
         this.viewSource.itemsSource = source;
-        this.viewSource.refresh();
+        this.autoRefresh();
     }
 
     public get itemsSource(): any[] {
@@ -135,6 +141,20 @@ export class DataGrid implements AfterViewInit {
 
     private get items(): any[] {
         return this.itemsPresenter;
+    }
+
+    public deferRefresh(): void {
+        this.deferRefreshInternal = true;
+    }
+
+    public refresh(): void {
+        this.viewSource.refresh();
+        this.deferRefreshInternal = false;
+    }
+
+    private autoRefresh(): void {
+        if (this.deferRefreshInternal) return;
+        this.viewSource.refresh();
     }
 
     private onItemsViewChanged(items: any[]): void {
@@ -146,32 +166,27 @@ export class DataGrid implements AfterViewInit {
         event.stopPropagation();
         event.preventDefault();
 
-        column.cycleSortDirections();
+        if (column.disableSorting) {
+            return;
+        }
 
+        this.deferRefresh();
         if (!event.ctrlKey) {
-            this.viewSource.sortDescriptors.splice(0);
             this.columns.forEach(x => {
-                if (x.config.id === column.config.id) return;
-                x.sortDirection = null;
+                if (x.id === column.id) return;
+                x.sortDirection = undefined;
             });
         }
 
-        let descriptor = new SortDescriptor(column.config.id, column.sortDirection, column.config.valueAccessor);
-        let index = this.viewSource.sortDescriptors.findIndex(x => x.id === column.config.id);
-        if (~index) {
-            this.viewSource.sortDescriptors.splice(index, 1, descriptor);
-        } else {
-            this.viewSource.sortDescriptors.push(descriptor);
-        }
-
-        this.viewSource.refresh();
+        column.cycleSortDirections();
+        this.refresh();
     }
 
     private onPageChanged(event: Event, i: number) {
         event.preventDefault();
 
         this.viewSource.pageIndex = i;
-        this.viewSource.refresh();
+        this.autoRefresh();
     }
 
     private get pagingRange(): number[] {

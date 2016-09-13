@@ -20,7 +20,11 @@ export class CellDirective {
 
     @Input()
     public set xnCell(args: CellRenderArgs) {
-        let r = args.column.config.cellRenderer(args.data, args.cell, args.row);
+        let r = args.column.cellRenderer(args.data, args.cell, args.row);
+        if (r == null || r == "") {
+            return;
+        }
+
         if (typeof r === "string") {
             let parser = new DOMParser();
             let document = parser.parseFromString(r, "text/html");

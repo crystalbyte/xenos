@@ -4,8 +4,7 @@ import { DataGridColumn } from "./data-grid-column";
 export class ColumnFilterDescriptor extends FilterDescriptor {
 
     constructor(column: DataGridColumn, value: any, predicate: (x: any) => any) {
-        let id = `${column.config.id}#${value}`;
-        super(id, predicate, column.config.id);
+        super(`__filter#${column.id}#${value}`, predicate, column.id);
 
         this.value = value;
         this.column = column;

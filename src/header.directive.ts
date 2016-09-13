@@ -19,8 +19,11 @@ export class HeaderDirective {
 
     @Input()
     public set xnHeader(args: HeaderRenderArgs) {
+        let r = args.column.headerRenderer(args.cell, args.row);
+        if (r == null || r == "") {
+            return;
+        }
 
-        let r = args.column.config.headerRenderer(args.cell, args.row);
         if (typeof r === "string") {
             let parser = new DOMParser();
             let document = parser.parseFromString(r, "text/html");

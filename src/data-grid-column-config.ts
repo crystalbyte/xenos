@@ -7,4 +7,6 @@ export interface DataGridColumnConfig {
     valueAccessor: (x: any) => any;
     hidden?: boolean;
     sortDirection?: SortDirection;
+    disableSorting?: boolean;
+    disableFiltering?: boolean;
 }

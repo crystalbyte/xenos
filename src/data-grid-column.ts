@@ -3,6 +3,7 @@ import { DataGrid } from "./data-grid.component";
 import { FilterCandidate } from "./filter-candidate";
 import { FilterDescriptor } from "./filter-descriptor";
 import { ColumnFilterDescriptor } from "./column-filter-descriptor";
+import { ColumnSortDescriptor } from "./column-sort-descriptor";
 import { SortDirection } from "./sort-direction";
 import { SortDescriptor } from "./sort-descriptor";
 import { IdGenerator } from "./id-generator";
@@ -16,8 +17,8 @@ import "rxjs/add/operator/map";
 export class DataGridColumn {
 
     private threshold: number = 25;
+    private config: DataGridColumnConfig;
     private debounceThreshold: number = 200;
-    private sortDirectionInternal: SortDirection;
     private candidateQueryInternal: string = "";
     private candidates: FilterCandidate[] = [];
     private candidateFinder: Subject<string> = new Subject<string>();
@@ -25,28 +26,23 @@ export class DataGridColumn {
     new Map<SortDirection, SortDirection>();
 
     constructor(config?: DataGridColumnConfig) {
-        this.sortDirectionCycler.set(null, SortDirection.ascending);
-        this.sortDirectionCycler.set(SortDirection.ascending, SortDirection.descending);
-        this.sortDirectionCycler.set(SortDirection.descending, SortDirection.ascending);
-        this.sortDirection = null;
-
-        if (config == null) {
+        if (!config) {
             config = this.getDefaultOptions();
         }
 
-        if (config.id == null) {
-            config.id = IdGenerator.getNext();
+        if (!config.id) {
+            config.id = IdGenerator.getNextColumnId();
         }
 
-        if (config.sortDirection != null) {
-            this.sortDirection = config.sortDirection;
+        if (!config.sortDirection) {
+            config.sortDirection = undefined;
         }
-
-        if (config.hidden == null) {
-            config.hidden = false;
-        } 
 
         this.config = config;
+        this.sortDirectionCycler.set(undefined, SortDirection.ascending);
+        this.sortDirectionCycler.set(SortDirection.ascending, SortDirection.descending);
+        this.sortDirectionCycler.set(SortDirection.descending, SortDirection.ascending);
+
         this.candidateFinder.asObservable()
             .debounce(x => Observable.timer(this.debounceThreshold))
             .observeOn(async)
@@ -57,28 +53,98 @@ export class DataGridColumn {
             });
     }
 
-    public config: DataGridColumnConfig;
     public dataGrid: DataGrid;
 
+    public get id(): any {
+        return this.config.id;
+    }
+
+    public get initialSortDirection(): SortDirection {
+        return this.config.sortDirection;
+    }
+
     public get sortDirection(): SortDirection {
-        return this.sortDirectionInternal;
+        this.ensureAttachment();
+        let id = IdGenerator.synthesizeColumnSortId(this);
+        let desc = this.dataGrid.sortDescriptors.find(x => x.id == id);
+        return desc ? desc.direction : undefined;
     }
 
     public set sortDirection(direction: SortDirection) {
-        this.sortDirectionInternal = direction;
+        this.ensureAttachment();
+
+        let id = IdGenerator.synthesizeColumnSortId(this);
+        let index = this.dataGrid.sortDescriptors.findIndex(x => x.id === id);
+        if (~index) {
+            if (direction) {
+                let descriptor = new ColumnSortDescriptor(this, direction);
+                this.dataGrid.sortDescriptors.splice(index, 1, descriptor);
+            } else {
+                this.dataGrid.sortDescriptors.splice(index, 1);
+            }
+        } else {
+            if (direction) {
+                let descriptor = new ColumnSortDescriptor(this, direction);
+                this.dataGrid.sortDescriptors.push(descriptor);
+            }
+        }
+    }
+
+    public get hidden(): boolean {
+        return this.config.hidden;
+    }
+
+    public set hidden(value: boolean) {
+        this.config.hidden = value;
+    }
+
+    public get disableSorting(): boolean {
+        return this.config.disableSorting;
+    }
+
+    public set disableSorting(value: boolean) {
+        this.config.disableSorting = value;
+    }
+
+    public get disableFiltering(): boolean {
+        return this.config.disableFiltering;
+    }
+
+    public set disableFiltering(value: boolean) {
+        this.config.disableFiltering = value;
+    }
+
+    public get valueAccessor(): (x: any) => any {
+        return this.config.valueAccessor;
+    }
+
+    public get cellRenderer(): (x: any, c?: HTMLTableCellElement, r?: HTMLTableRowElement) => string | HTMLElement {
+        return this.config.cellRenderer;
+    }
+
+    public get headerRenderer(): (c?: HTMLTableHeaderCellElement, r?: HTMLTableRowElement) => string | HTMLElement {
+        return this.config.headerRenderer;
+    }
+
+    private ensureAttachment(): void {
+        if (!this.dataGrid) {
+            throw new Error("The column is not attached to a grid.");
+        }
     }
 
     private get activeFilters(): ColumnFilterDescriptor[] {
+        this.ensureAttachment();
+
         return this.dataGrid.filterDescriptors
             .map(x => <any>x)
-            .filter(x => x.column != null)
+            .filter(x => x.column)
             .map(x => <ColumnFilterDescriptor>x)
-            .filter(x => x.column.config.id == this.config.id);
+            .filter(x => x.column.id === this.id);
     }
 
-    public set candidateQuery(value: string) {
-        this.candidateQueryInternal = value;
-        this.candidateFinder.next(value);
+    public set candidateQuery(phrase: string) {
+        this.candidateQueryInternal = phrase;
+        this.candidateFinder.next(phrase);
     }
 
     public get candidateQuery(): string {
@@ -91,13 +157,14 @@ export class DataGridColumn {
     }
 
     public cycleSortDirections(): void {
-        this.sortDirectionInternal = this.sortDirectionCycler.get(this.sortDirectionInternal);
+        this.sortDirection = this.sortDirectionCycler.get(this.sortDirection);
     }
 
     private removeAllColumnFilters(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
 
+        this.ensureAttachment();
         let filters = this.dataGrid.filterDescriptors.filter(x => x.groupId !== this.config.id);
         this.dataGrid.filterDescriptors.splice(0);
         filters.forEach(x => this.dataGrid.filterDescriptors.push(x));
@@ -107,6 +174,7 @@ export class DataGridColumn {
         event.preventDefault();
         event.stopPropagation();
 
+        this.ensureAttachment();
         let index = this.dataGrid.filterDescriptors.findIndex(x => x.id === descriptor.id);
         if (~index) {
             this.dataGrid.filterDescriptors.splice(index, 1);
@@ -117,8 +185,9 @@ export class DataGridColumn {
         event.preventDefault();
         event.stopPropagation();
 
+        this.ensureAttachment();
         var desc = new ColumnFilterDescriptor(this, candidate.value, x => {
-            let value = this.config.valueAccessor(x);
+            let value = this.valueAccessor(x);
             return value === candidate.value;
         });
 
@@ -130,16 +199,15 @@ export class DataGridColumn {
     }
 
     private findCandidates(query: string): FilterCandidate[] {
+        this.ensureAttachment();
 
         let distinctValues = new Map<any, any>();
-
         this.dataGrid.itemsSource.forEach(x => {
             let value = this.config.valueAccessor(x);
             if (!distinctValues.has(value)) {
                 distinctValues.set(value, x);
             }
         });
-
 
         let empty = (query == null || query == "");
         // If we don't have a specific query and there are only a few items in the source, we simply return all.
@@ -189,8 +257,8 @@ export class DataGridColumn {
 
     private getDefaultOptions(): DataGridColumnConfig {
         return {
-            id: null,
-            headerRenderer: () => "",
+            id: undefined,
+            headerRenderer: () => undefined,
             cellRenderer: x => x,
             valueAccessor: x => x
         }
