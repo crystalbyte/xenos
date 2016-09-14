@@ -7,6 +7,8 @@ import { ColumnSortDescriptor } from "./column-sort-descriptor";
 import { SortDirection } from "./sort-direction";
 import { SortDescriptor } from "./sort-descriptor";
 import { IdGenerator } from "./id-generator";
+import { CandidateMatcher } from "./candidate-matcher";
+import { DefaultCandidateMatcher } from "./default-candidate-matcher";
 import { Subject } from "rxjs/Subject";
 import { Observable } from "rxjs/Observable";
 import { async } from "rxjs/scheduler/async";
@@ -39,9 +41,12 @@ export class DataGridColumn {
         }
 
         this.config = config;
+        this.sortDirectionCycler.set(null, SortDirection.ascending);
         this.sortDirectionCycler.set(undefined, SortDirection.ascending);
         this.sortDirectionCycler.set(SortDirection.ascending, SortDirection.descending);
         this.sortDirectionCycler.set(SortDirection.descending, SortDirection.ascending);
+
+        this.matchers = [new DefaultCandidateMatcher()];
 
         this.candidateFinder.asObservable()
             .debounce(x => Observable.timer(this.debounceThreshold))
@@ -54,6 +59,7 @@ export class DataGridColumn {
     }
 
     public dataGrid: DataGrid;
+    public matchers: CandidateMatcher[];
 
     public get id(): any {
         return this.config.id;
@@ -202,67 +208,86 @@ export class DataGridColumn {
         this.dataGrid.filterDescriptors.push(desc);
     }
 
-    private findCandidates(query: string): FilterCandidate[] {
+    private findCandidates(phrase: string): FilterCandidate[] {
         this.ensureAttachment();
 
+        if (!this.dataGrid.lastSnapShot) {
+            return [];
+        }
+
+        let distinctDates = new Map<number, Date>();
         let distinctValues = new Map<any, any>();
-        this.dataGrid.itemsSource.forEach(x => {
+
+        // We need to restrict the candidate selection for all columns if filters are set to only
+        // allow possible combinations except for the active one in case we want to change the current selection.
+        let source = this.activeFilters.length > 0
+            ? this.dataGrid.lastSnapShot.items
+            : this.dataGrid.lastSnapShot.processedItems;
+
+        source.forEach(x => {
             let value = this.config.valueAccessor(x);
+
+            // Dates require special treatment for they are compared by reference and not by value,
+            // which means the Map will not recognize equal dates coming from different instances. 
+            if (value instanceof Date) {
+                let ms = value.getTime();
+                if (!distinctDates.has(ms)) {
+                    distinctDates.set(ms, value);
+                }
+
+                return;
+            }
+
             if (!distinctValues.has(value)) {
-                distinctValues.set(value, x);
+                distinctValues.set(value, value);
             }
         });
 
-        let empty = (query == null || query == "");
+        // Merge date and non-date items
+        distinctDates.forEach(x => {
+            distinctValues.set(x, x);
+        }); 
+
         // If we don't have a specific query and there are only a few items in the source, we simply return all.
+        let empty = (phrase == null || phrase == "");
         if (empty && distinctValues.size < this.threshold) {
             let values = [];
             distinctValues.forEach(x => {
-                let value = this.config.valueAccessor(x);
-                values.push(new FilterCandidate(value));
+                values.push(new FilterCandidate(x));
             });
             return values;
         }
 
-        var regex = new RegExp(`${query}`, "i");
+        if (empty) {
+            return source;
+        }
 
-        let candidates = [];
-        this.dataGrid.itemsSource.some(x => {
-            let value = this.config.valueAccessor(x);
-            if (value === query) {
-                candidates.push(new FilterCandidate(value));
-                return false;
-            }
+        let values = [];
+        distinctValues.forEach(x => {
+            let match = false;
 
-            if (this.isNumber(value)) {
-                let num = <number>value;
-                if (regex.test(num.toString())) {
-                    candidates.push(new FilterCandidate(value));
-                    return false;
+            this.matchers.forEach(y => {
+                if (match) {
+                    return;
                 }
-            }
 
-            if (typeof value === "string") {
-                let text = <string>value;
-                if (regex.test(value)) {
-                    candidates.push(new FilterCandidate(value));
-                }
-            }
+                match = y.match(phrase, x);
+            });
 
-            return false;
+            if (match) {
+                values.push(new FilterCandidate(x));
+            }
         });
-
-        return candidates;
-    }
-
-    private isNumber(n): boolean {
-        return !isNaN(parseFloat(n)) && isFinite(n);
+        return values;
     }
 
     private getDefaultOptions(): DataGridColumnConfig {
         return {
             id: undefined,
             headerRenderer: () => undefined,
+            disableFiltering: false,
+            disableSorting: false,
+            hidden: false,
             cellRenderer: x => x,
             valueAccessor: x => x
         }

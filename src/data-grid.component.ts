@@ -30,10 +30,11 @@ declare var module: { id: any }
 export class DataGrid implements AfterViewInit {
 
     private itemsPresenter: any[] = [];
-    private viewSource: ViewSource = null;
+    private viewSource: ViewSource;
     private pagingRangeInternal: number[] = [];
     private deferRefreshInternal: boolean = false;
-    private columnsInternal: ObservableArray<DataGridColumn> = null;
+    private columnsInternal: ObservableArray<DataGridColumn>;
+    private lastSnapShotInternal: ItemsPreview;
 
     constructor(
         private renderer: Renderer,
@@ -41,6 +42,9 @@ export class DataGrid implements AfterViewInit {
         private i18nService: I18nService) {
 
         this.viewSource = new ViewSource();
+        this.viewSource.itemsViewChanging
+            .subscribe(x => this.lastSnapShotInternal = x);
+
         this.viewSource.itemsViewChanged
             .subscribe(x => this.onItemsViewChanged(x));
 
@@ -134,6 +138,14 @@ export class DataGrid implements AfterViewInit {
     public set itemsSource(source: any[]) {
         this.viewSource.itemsSource = source;
         this.autoRefresh();
+    }
+
+    public get lastSnapShot(): ItemsPreview {
+        if (!this.lastSnapShotInternal) {
+            return undefined; 
+        }
+
+        return this.lastSnapShotInternal;
     }
 
     public get itemsSource(): any[] {
