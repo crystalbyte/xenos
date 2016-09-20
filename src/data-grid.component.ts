@@ -61,7 +61,7 @@ export class DataGrid implements AfterViewInit {
             x.itemsRemoved.forEach(x => x.dataGrid = undefined);
             x.itemsAdded.forEach(x => {
                 x.dataGrid = this;
-                if (x.sortDirection) {
+                if (x.initialSortDirection) {
                     x.sortDirection = x.initialSortDirection;
                 }
             });
