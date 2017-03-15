@@ -1,6 +1,6 @@
 ﻿import { Directive, Input, ElementRef } from "@angular/core";
 import { DataGridColumn } from "./data-grid-column";
-import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
+import { I18nService } from "./i18n.service";
 
 // No typings for jquery.
 declare var $: any;
@@ -13,8 +13,7 @@ interface PopoverConfig {
 }
 
 @Directive({
-    selector: "[xnPopover]",
-    providers: [I18N_SERVICE_PROVIDER]
+    selector: "[xnPopover]"
 })
 export class PopoverDirective {
 

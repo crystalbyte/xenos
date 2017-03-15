@@ -1,9 +1,8 @@
 ﻿import { Directive, ElementRef, Input, Renderer } from "@angular/core";
-import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
+import { I18nService } from "./i18n.service";
 
 @Directive({
-    selector: "[xnI18n]",
-    providers: [I18N_SERVICE_PROVIDER]
+    selector: "[xnI18n]"
 })
 export class I18nDirective {
 

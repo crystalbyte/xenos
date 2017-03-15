@@ -1,4 +1,4 @@
-﻿import { Injectable, provide } from "@angular/core";
+﻿import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { I18nArgs } from "./i18n.args";
@@ -22,9 +22,3 @@ export class I18nService implements I18n {
         return args.value;
     }
 }
-
-export const I18N_SERVICE_PROVIDER = [
-    provide(I18nService, {
-        useValue: new I18nService()
-    })
-];

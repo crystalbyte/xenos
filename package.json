@@ -1,6 +1,6 @@
 {
   "name": "xenos",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Xenos is a data grid built upon angular2 and bootstrap.",
   "main": "index.js",
   "scripts": {
@@ -24,15 +24,13 @@
   },
   "homepage": "https://github.com/crystalbyte/xenos#readme",
   "dependencies": {
-    "@angular/core": "2.0.0-rc.4",
-    "@angular/compiler": "2.0.0-rc.4",
-    "@angular/common": "2.0.0-rc.4",
-    "@angular/forms": "0.2.0",
-    "core-js": "^2.4.0",
-    "reflect-metadata": "^0.1.3",
-    "zone.js": "0.6.15",
-    "rxjs": "5.0.0-beta.6",
-    "bootstrap": "^3.3.6"
+    "@angular/common": "^2.4.9",
+    "@angular/compiler": "^2.4.9",
+    "@angular/core": "^2.4.9",
+    "@angular/forms": "^2.4.9",
+    "bootstrap": "^3.3.6",
+    "rxjs": "^5.0.1",
+    "zone.js": "^0.7.2"
   },
   "devDependencies": {
     "less": "^2.7.1",

@@ -1,16 +1,14 @@
 ﻿import { Component, ElementRef, Input, Renderer, ViewChild, AfterViewInit } from "@angular/core";
 import { ViewSource, ItemsPreview } from "./view-source";
-import { CellDirective } from "./cell.directive";
-import { HeaderDirective } from "./header.directive";
+
+
 import { DataGridColumn } from "./data-grid-column";
 import { SortDescriptor } from "./sort-descriptor";
 import { FilterDescriptor } from "./filter-descriptor";
 import { FtsFilterDescriptor } from "./fts-filter-descriptor";
-import { I18N_SERVICE_PROVIDER, I18nService } from "./i18n.service";
+import { I18nService } from "./i18n.service";
 import { I18n } from "./i18n";
-import { I18nDirective } from "./i18n.directive";
 import { ObservableArray } from "./observable-array";
-import { PopoverDirective } from "./popover.directive";
 import { Observable } from "rxjs/Observable";
 
 // Some IDE's won't recognize the module node. I'm looking at you VS2015 ...
@@ -20,16 +18,15 @@ declare var module: { id: any }
     moduleId: module.id,
     selector: "data-grid",
     templateUrl: "data-grid.component.html",
-    styleUrls: ["data-grid.component.min.css"],
-    directives: [CellDirective, HeaderDirective, I18nDirective, PopoverDirective],
-    providers: [I18N_SERVICE_PROVIDER]
+    styleUrls: ["data-grid.component.min.css"]
 })
 export class DataGrid implements AfterViewInit {
 
     private itemsPresenter: any[] = [];
     private viewSource: ViewSource = null;
     private pagingRangeInternal: number[] = [];
-    private columnsInternal: ObservableArray<DataGridColumn> = null;
+    private columnsInternal: ObservableArray<DataGridColumn> 
+        = new ObservableArray<DataGridColumn>();
 
     constructor(
         private renderer: Renderer,
@@ -44,7 +41,6 @@ export class DataGrid implements AfterViewInit {
             this.viewSource.refresh();
         });
 
-        this.columnsInternal = new ObservableArray<DataGridColumn>();
         this.columnsInternal.itemsChanged.subscribe(x => {
             x.itemsRemoved.forEach(x => x.dataGrid = null);
             x.itemsAdded.forEach(x => {
@@ -91,7 +87,7 @@ export class DataGrid implements AfterViewInit {
         return this.i18nService;
     }
 
-    public get columns(): DataGridColumn[] {
+    public get columns(): ObservableArray<DataGridColumn> {
         return this.columnsInternal;
     }
 
