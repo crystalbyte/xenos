@@ -3,13 +3,14 @@
         <tr #theadrow class="xn-header-row">
             <th *ngFor="let c of columns" [hidden]="c.config?.hidden" class="xn-header-cell" #theadcell>
                 <div style="display: flex; flex-direction: row;">
-                    <div style="flex: 1 100%;" [class.text-primary]="c.activeFilters.length > 0" [xnHeader]="{column: c, cell: theadcell, row: theadrow}" (click)="onHeaderClicked($event, c)"></div>
-                    <div style="flex: 0 auto;" [ngSwitch]="c.sortDirection" style="padding-left: 8px;">
+                    <div style="flex: 1 100%;" [class.text-primary]="c.activeFilters.length > 0" [xnHeader]="{column: c, cell: theadcell, row: theadrow}"
+                        (click)="onHeaderClicked($event, c)"></div>
+                    <div style="flex: 1 auto;" [ngSwitch]="c.sortDirection" style="padding-left: 4px;" *ngIf="!c.disableSorting">
                         <span *ngSwitchCase="1" class="glyphicon glyphicon-sort-by-attributes text-muted xn-sort-icon"></span>
                         <span *ngSwitchCase="2" class="glyphicon glyphicon-sort-by-attributes-alt text-muted xn-sort-icon"></span>
                         <span *ngSwitchDefault class="glyphicon glyphicon-sort text-muted xn-sort-icon"></span>
                     </div>
-                    <div style="flex: 0 auto;">
+                    <div style="flex: 1 auto;" *ngIf="!c.disableFiltering">
                         <span class="xn-options-button" [xnPopover]="{column: c, content: content, input: input, close: close}" xn-linked>
                             <span class="glyphicon glyphicon-option-vertical"></span>
                         </span>
@@ -23,10 +24,10 @@
                                 <div class="list-group" *ngIf="c.activeFilters.length > 0">
                                     <a href="#" class="list-group-item active" *ngFor="let f of c.activeFilters" (click)="c.removeFilter($event, f)">
                                         <div style="display: flex; flex-direction: row;">
-                                            <span style="flex: 1 100%;">{{f.value}}</span>
-                                            <span style="flex: 0 auto;">
+                                            <div style="flex: 1 100%;" [xnCandidate]="{ data: f.value, column: c }"></div>
+                                            <div style="flex: 0 auto;">
                                                 <span class="glyphicon glyphicon-minus"></span>
-                                            </span>
+                                            </div>
                                         </div>
                                     </a>
                                 </div>
@@ -43,10 +44,10 @@
                                 <div class="list-group" *ngIf="c.candidates.length <= c.threshold">
                                     <a href="#" class="list-group-item" *ngFor="let can of c.candidates" (click)="c.onCandidateClicked($event, can)">
                                         <div style="display: flex; flex-direction: row;">
-                                            <span style="flex: 1 100%;">{{can.value}}</span>
-                                            <span style="flex: 0 auto;">
+                                            <div style="flex: 1 100%;" [xnCandidate]="{ data: can.value, column: c }"></div>
+                                            <div style="flex: 0 auto;">
                                                 <span class="glyphicon glyphicon-plus"></span>
-                                            </span>
+                                            </div>
                                         </div>
                                     </a>
                                 </div>

@@ -10,7 +10,7 @@ export class FtsFilterDescriptor extends FilterDescriptor {
             var regex = new RegExp(`${phrase}`, "i");
             for (let i = 0; i < columns.length; i++) {
                 let column = columns[i];
-                let value = column.config.valueAccessor(x);
+                let value = column.valueAccessor(x);
 
                 if (typeof value === "string" && regex.test(value)) {
                     return true;

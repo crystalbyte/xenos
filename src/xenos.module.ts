@@ -7,17 +7,26 @@ import { I18nDirective } from "./i18n.directive";
 import { PopoverDirective } from "./popover.directive";
 import { I18nService } from "./i18n.service";
 import { DataGrid } from "./data-grid.component";
+import { CandidateDirective } from "./candidate.directive";
 
 @NgModule({
     imports: [CommonModule, FormsModule],
     declarations: [
         CellDirective,
         HeaderDirective,
+        CandidateDirective,
         I18nDirective,
         PopoverDirective,
         DataGrid
     ],
-    exports: [DataGrid],
+    exports: [
+        DataGrid, 
+        CandidateDirective, 
+        CellDirective, 
+        PopoverDirective, 
+        HeaderDirective, 
+        I18nDirective
+    ],
     providers: [I18nService]
 })
 export class XenosModule { }

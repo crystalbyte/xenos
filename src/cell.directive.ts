@@ -1,5 +1,6 @@
 ﻿import { Directive, ElementRef, Renderer, Input } from "@angular/core";
 import { DataGridColumn } from "./data-grid-column";
+import { ElementRenderer } from "./element-renderer";
 
 interface CellRenderArgs {
     data: any;
@@ -13,30 +14,21 @@ interface CellRenderArgs {
 })
 export class CellDirective {
 
+    private elementRenderer: ElementRenderer;
+
     constructor(
         private renderer: Renderer,
         private elementRef: ElementRef) {
+        this.elementRenderer = new ElementRenderer(elementRef, renderer);
     }
 
     @Input()
     public set xnCell(args: CellRenderArgs) {
-        let r = args.column.config.cellRenderer(args.data, args.cell, args.row);
-        if (typeof r === "string") {
-            let parser = new DOMParser();
-            let document = parser.parseFromString(r, "text/html");
-            let body = document.getElementsByTagName("body")[0];
-            this.appendToCell(body.firstChild);
+        let value = args.column.cellRenderer(args.data, args.cell, args.row);
+        if (value == null || value == "") {
             return;
         }
 
-        if (typeof r === "object") {
-            this.appendToCell(r);
-            return;
-        }
-    }
-
-    private appendToCell(element: Node): void {
-        let root = this.elementRef.nativeElement;
-        this.renderer.invokeElementMethod(root, "appendChild", [element])
+        this.elementRenderer.render(value);
     }
 }

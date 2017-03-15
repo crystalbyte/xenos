@@ -12,8 +12,7 @@ import "rxjs/add/operator/observeOn";
 
 export interface ItemsPreview {
     items?: any[];
-    filteredItems?: any[];
-    sortedItems?: any[];
+    processedItems?: any[];
     viewItems?: any[];
 }
 
@@ -44,16 +43,16 @@ export class ViewSource {
                 return container;
             })
             .map(x => {
-                x.filteredItems = this.filterItems(x.items); 
+                x.processedItems = this.filterItems(x.items); 
                 return x;
             })
-            .do(x => this.calculatePageCount(x.filteredItems))
+            .do(x => this.calculatePageCount(x.processedItems))
             .map(x => {
-                x.sortedItems = this.sortItems(x.filteredItems);
+                x.processedItems = this.sortItems(x.processedItems);
                 return x;
             })
             .map(x => {
-                x.viewItems = this.applyPaging(x.sortedItems);
+                x.viewItems = this.applyPaging(x.processedItems.slice(0));
                 return x;
             })
             .map(x => {
